@@ -1,28 +1,37 @@
 import { inngest } from "./client";
-
+import { Sandbox } from "@e2b/code-interpreter";
 import { createAgent, openai } from "@inngest/agent-kit";
+import { getSandbox } from "./utils";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world" },
   { event: "test/hello.world" },
-  async ({ event }) => {
-    const codeWriterAgent = createAgent({
-      name: "Code writer",
+  async ({ event, step }) => {
+    const sandboxId = await step.run("get-sandbox-id", async () => {
+      const sandbox = await Sandbox.create("vibe-nextjs-sulaiman-31");
+      return sandbox.sandboxId;
+    });
+
+    const codeAgent = createAgent({
+      name: "Code-agent",
       system:
-        "You are an expert TypeScript programmer.  Given a set of asks, you think step-by-step to plan clean, " +
-        "idiomatic TypeScript code, with comments and tests as necessary." +
-        "Do not respond with anything else other than the following XML tags:" +
-        "- If you would like to write code, add all code within the following tags (replace $filename and $contents appropriately):" +
-        "  <file name='$filename.ts'>$contents</file>",
+        "You are a Next.js developer. You write readable, maintainable, and efficient code. You write simple Next.js and React snippets.",
       model: openai({
         model: "gpt-4o",
       }),
     });
 
-    const { output } = await codeWriterAgent.run(
-      `Write a typescript function that removes unnecessary whitespace`
+    const { output } = await codeAgent.run(
+      `Write the following snippet: ${event.data.value}`
     );
 
-    return { output, event };
+    const sandboxUrl = await step.run("get-sandbox-url", async () => {
+      const sandbox = await getSandbox(sandboxId);
+      const host = sandbox.getHost(3000);
+
+      return `https://${host}`;
+    });
+
+    return { output, sandboxUrl };
   }
 );
