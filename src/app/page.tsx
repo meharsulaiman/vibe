@@ -11,7 +11,11 @@ const Page = () => {
   return (
     <div className="p-4 max-w-7xl mx-auto">
       <Button
-        onClick={() => invoke.mutate({ text: "Create a button component" })}
+        onClick={() =>
+          invoke.mutate({
+            text: "Create a kanban drag and drop board use react-beautiful-dnd",
+          })
+        }
       >
         Invoke Background Job
       </Button>
