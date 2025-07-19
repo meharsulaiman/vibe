@@ -178,6 +178,7 @@ export const codeAgentFunction = inngest.createFunction(
             content: "Something went wrong while running the code agent",
             role: "ASSISTANT",
             type: "ERROR",
+            projectId: event.data.projectId,
           },
         });
       }
@@ -187,6 +188,7 @@ export const codeAgentFunction = inngest.createFunction(
           content: result.state.data.summary,
           role: "ASSISTANT",
           type: "RESULT",
+          projectId: event.data.projectId,
           fragment: {
             create: {
               sandboxUrl: sandboxUrl,
