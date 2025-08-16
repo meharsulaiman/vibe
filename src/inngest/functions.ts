@@ -97,8 +97,8 @@ export const codeAgentFunction = inngest.createFunction(
                 console.error(`Error creating/updating files: ${error}`);
               }
             });
-            if (typeof newFiles === "object") {
-              network.state.data.files = newFiles;
+            if (newFiles != null && typeof newFiles === "object") {
+              network.state.data.files = newFiles as { [path: string]: string };
             }
           },
         }),
